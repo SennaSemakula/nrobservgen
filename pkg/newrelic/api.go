@@ -2,12 +2,12 @@ package newrelic
 
 import (
 	"encoding/json"
-	_ "encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 
-	"github.com/SennaSemakula/nrobservgen/internal/http"
+	"github.com/SennaSemakula/nrobservgen/pkg/http"
 )
 
 const api = "https://api.eu.newrelic.com/v2"
@@ -16,18 +16,18 @@ type Application struct {
 	Apps []interface{} `json:"applications"`
 }
 
-func getAPMData(c *http.Client, app string) error {
+func getAPMData(c http.HTTPClient, app, token string) error {
 	// Move this out
 	url := fmt.Sprintf("%s/applications.json", api)
 
 	headers := map[string]string{
-		"API-Key": c.Token,
+		"API-Key": token,
 	}
 	params := map[string]string{
 		"filter[name]": app,
 	}
 
-	req, err := c.NewRequest(url, headers, params)
+	req, err := http.NewRequest(url, headers, params)
 	if err != nil {
 		return err
 	}
@@ -60,12 +60,12 @@ func getAPMData(c *http.Client, app string) error {
 }
 
 func GetAPMData(app string) error {
-	envVar := "NR_API_KEY"
+	envVar := os.Getenv("NR_API_KEY")
 	if len(os.Getenv(envVar)) < 1 {
-		return fmt.Errorf("missing %s environment variable", envVar)
+		return errors.New("missing NR_API_KEY environment variable")
 	}
-	c := http.NewClient(os.Getenv(envVar))
-	if err := getAPMData(c, app); err != nil {
+	c := http.NewClient(envVar)
+	if err := getAPMData(c, app, envVar); err != nil {
 		return err
 	}
 

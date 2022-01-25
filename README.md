@@ -27,16 +27,23 @@ Creates monitoring.yaml file to define your alerts and dashboards. Additionally 
 ```
 nrobservgen template --service <service_name>
 ```
-### Template files:
-![Generated files](assets/tree.png)
+![Generated files](assets/template.png)
+<br/>
+#### Manifest
+![Yaml file](assets/yaml.png)
+#### Total files
+![Tree](assets/tree.png)
 ### Validate command
 Simulates a dry run by checking whether your alert runbooks, thresholds and values are valid. 
 ```
 nrobservgen validate --config <config_file>
 ```
-### valid config:
+### valid config
 ![Valid Config](assets/success.png)
 <br>
 ### invalid config:
-![Invalid Config](assets/failure.png)
+#### wrong data type
+![Invalid Config](assets/invalid_data_type.png)
+#### dead runbooks
+![Invalid Config](assets/invalid_runbooks.png)
 

@@ -33,6 +33,7 @@ func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 func TestGetAPMData(t *testing.T) {
 	t.Parallel()
+
 	client := MockClient{token: ""}
 	inputs := map[string]struct {
 		app      string

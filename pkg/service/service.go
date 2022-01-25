@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SennaSemakula/nrobservgen/internal/http"
 	"github.com/SennaSemakula/nrobservgen/pkg/common"
+	"github.com/SennaSemakula/nrobservgen/pkg/http"
 	"github.com/SennaSemakula/nrobservgen/pkg/newrelic"
 )
 
@@ -167,7 +167,8 @@ func validVersion(vers string) error {
 		}
 		return false
 	}
-	remoteTags, err := http.GetTags(c, user, pass, url+path)
+	bb := http.NewBitbucket(url+path, user, pass)
+	remoteTags, err := bb.GetTags(c)
 	if err != nil {
 		return fmt.Errorf("unable to find terraform module version %s: %v", vers, err)
 	}
@@ -184,14 +185,14 @@ func validateRunbooks(alerts map[string]AlertConfig) (bool, error) {
 		return false, fmt.Errorf("missing %s", envVar)
 	}
 	c := http.NewInsecureClient(token)
-
+	conf := http.NewConfluence(token)
 	var invalid int
 	for _, v := range alerts {
 		// Alert is disabled so no need to perform validation checks on runbook
 		if !v.Enabled {
 			continue
 		}
-		if err := http.GetRunbook(c, v.Runbook); err != nil {
+		if err := conf.GetRunbook(c, v.Runbook); err != nil {
 			fmt.Println(err)
 			invalid++
 		}
